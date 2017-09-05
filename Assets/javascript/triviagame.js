@@ -23,7 +23,7 @@ var triviaGame = { questionCounter: 0,
 				   correctAnswerCounter: 0,
 				   wrongAnswerCounter: 0,
 				   unansweredCounter: 0,
-				   questionTimer: 30,
+				   questionTimer: 10,
 				   timerRunning: false,
 				   clock: "",
  
@@ -41,33 +41,31 @@ var triviaGame = { questionCounter: 0,
 				   this.correctAnswerCounter = 0;
 				   this.wrongAnswerCounter = 0;
 				   this.unansweredCounter = 0;
-				   this.questionTimer = 30;
+				   this.questionTimer = 10;
 				   this.generateHTML();
 				   this.timer();
 				   },
 
 				   countDown: function(){
-				   	if(this.questionTimer > 0){
+				   	if (this.questionTimer > 0){
 				   			this.questionTimer--;
-				   			this.timerRunning = true;
-				   		}
-				   		
-					if(this.questionTimer === 0){
-				   			clearInterval(this.clock);
-				   			this.timerRunning = false;
+				   		}	
+
+					if (this.questionTimer === 0){
+				   			clearInterval(this.clock);				   			
 				   			this.timeOut();
 				   		}
 
 				   	$('.timer').html(this.questionTimer);
+				   	
 				   },
 
 				   timer: function(){
-				   	this.clock = setInterval(this.countDown, 1000);
-
+				   	this.clock = setInterval(this.countDown.bind(this), 1000);
 				   },
 
 				   questionIterator: function(){
-				   	if(this.questionCounter < questionArray.length){
+				   	if (this.questionCounter < questionArray.length){
 				   		this.questionCounter++;
 				   		this.generateHTML();
 				   		this.questionTimer = 10;
@@ -77,6 +75,7 @@ var triviaGame = { questionCounter: 0,
 
 				   	 	this.endScreen();
 				   	 }
+
 				   },
 
 				   generateHTML: function(){
@@ -94,7 +93,7 @@ var triviaGame = { questionCounter: 0,
 				   	 $('.mainArea').html("<p class='text-center'>Time Remaining: <span class='timer'>" + this.questionTimer + "</span></p>"
 				   	  + "<p class='text-center'>Correct! The answer is: " + questionArray[this.questionCounter].answer + "</p>");
 
-				   	 setTimeout(this.questionIterator(), 4000);
+				   	 setTimeout(this.questionIterator.bind(this), 4000);
 				   },
 
 				   wrongAnswer: function(){
@@ -102,7 +101,7 @@ var triviaGame = { questionCounter: 0,
 				   	$('.mainArea').html("<p class='text-center'>Time Remaining: <span class='timer'>" + this.questionTimer + "</span></p>"
 				   	  + "<p class='text-center'>Incorrect! The correct answer is: " + questionArray[this.questionCounter].answer + "</p>");
 
-				   	 setTimeout(this.questionIterator(), 4000);
+				   	 setTimeout(this.questionIterator.bind(this), 4000);
 
 				   },
 
@@ -111,17 +110,17 @@ var triviaGame = { questionCounter: 0,
 				   	$('.mainArea').html("<p class='text-center'>Time Remaining: <span class='timer'>" + this.questionTimer + "</span></p>"
 				   	  + "<p class='text-center'>Time's up! The correct answer is: " + questionArray[this.questionCounter].answer + "</p>");
 
-				   	setTimeout(this.questionIterator(), 4000);
+				   	setTimeout(this.questionIterator.bind(this), 4000);
 				   },
 
 				   answerChecker: function(){
-				   	if($('.answer').val() === questionArray[questionCounter].answer){
-				   		clearInterval(this.timer());
+				   	if($('.answer').html() === questionArray[questionCounter].answer){
+				   		clearInterval(this.timer);
 				   		this.correctAnswer();
 				   	}
 				   	else{
-				   		clearInterval();
-				   		this.wrongAnswer(this.timer());
+				   		clearInterval(this.timer);
+				   		this.wrongAnswer();
 				   	}
 				   },
 
@@ -145,19 +144,18 @@ var triviaGame = { questionCounter: 0,
 $(document).ready(function() {
 
 triviaGame.initialize();
-console.log(triviaGame.timer());
 
-$('.start-button').on('click', function(){
+$('.start-button').on('click', function(event){
 	triviaGame.generateHTML();
 	triviaGame.timer();
 	});
 
-$('.answer').on('click', function(){
-trivia.answerCherker();
+$('.answer').on('click', function(event){
+	triviaGame.answerChecker();
 
 });
 
-$('.reset-button').on('click', function(){
+$('.reset-button').on('click', function(event){
 	triviaGame.reset();
 });
 
